@@ -1,8 +1,11 @@
-all: dut_aes32 dut_aesbitsliced dut_cmpmemcmp dut_cmpct dut_donna dut_donnabad 
+all: dut_aes32 dut_aesbitsliced dut_cmpmemcmp dut_cmpct \
+    dut_donna dut_donnabad dut_barrel_shiftrows
 
 OBJS = src/cpucycles.o src/fixture.o src/random.o \
 src/ttest.o src/percentile.o
 OBJS_AES32 = dut/aes32/rijndael-alg-fst.o
+OBJS_BARREL = dut/barrel_shiftrows/aes_encrypt.o \
+	      dut/barrel_shiftrows/aes_keyschedule_lut.o
 OBJS_DONNA = dut/donna/curve25519-donna.o
 OBJS_DONNABAD = dut/donnabad/curve25519-donnabad.o
 OBJS_AESBITSLICED = dut/aesbitsliced/afternm_aes128ctr.o \
@@ -41,8 +44,11 @@ dut_donna: $(OBJS) $(OBJS_DONNA) dut/donna/dut_donna.c
 dut_donnabad: $(OBJS) $(OBJS_DONNABAD) dut/donnabad/dut_donnabad.c
 	$(CC) $(LDFLAGS) $(INCS) -o dudect_donnabad_$(OPTIMIZATION) dut/donnabad/$@.c $(OBJS) $(OBJS_DONNABAD) $(LIBS)
 
+dut_barrel_shiftrows: $(OBJS) $(OBJS_BARREL) dut/barrel_shiftrows/dut_barrel_shiftrows.c
+	$(CC) $(LDFLAGS) $(INCS) -o dudect_barrel_shiftrows_$(OPTIMIZATION) $(LIBS) $^ -lm
+
 .c.o:
 	$(CC) $(CFLAGS) $(INCS) -c $< -o $@
 
 clean:
-	rm -f $(OBJS) $(OBJS_AES32) $(OBJS_AESBITSLICED) $(OBJS_DONNA) $(OBJS_DONNABAD) dudect_* *.exe a.out
+	rm -f $(OBJS) $(OBJS_AES32) $(OBJS_AESBITSLICED) $(OBJS_DONNA) $(OBJS_DONNABAD) $(OBJS_BARREL) dudect_* *.exe a.out
